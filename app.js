@@ -1,15 +1,23 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
+//var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var polyfills = require('./utils/polyfills');
+var init = require('./utils/init');
 var auth = require('./utils/auth');
 
 var routes = require('./routes/index');
 var products = require('./routes/products');
 var users = require('./routes/users');
+
+polyfills();
+var initialised = init();
+if (!initialised) {
+  console.log('ERROR. App is not initialised.');
+}
 
 var app = express();
 
@@ -26,7 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function (req, res, next) {
-  if (auth(req.get('Authentication'), req.get('Date'))) {
+  if (auth(req.get('Authorization'), req.get('Date'))) {
     next();
   } else {
     res.status(401).end();
