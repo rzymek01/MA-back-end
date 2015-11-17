@@ -43,6 +43,8 @@ app.use(function (req, res, next) {
 app.use(function (req, res, next) {
   if (auth(req.get('Authorization'), req.get('Date'))) {
     next();
+  } else if ('OPTIONS' === req.method) {
+    res.status(200).end();
   } else {
     res.status(401).end();
   }
