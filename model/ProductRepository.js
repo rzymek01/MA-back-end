@@ -45,8 +45,8 @@ ProductRepository.prototype.update = function(product) {
   var data = this.get(product.id);
   if (data) {
     data.name = product.name || data.name;
-    data.amount = product.amount || data.amount;
-    data.picture = product.picture || data.picture;
+    data.amount = (product.amount !== undefined) ? product.amount : data.amount;
+    data.picture = (product.picture !== undefined) ? product.picture : data.picture;
     return true;
   }
   return false;
