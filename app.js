@@ -12,6 +12,7 @@ var auth = require('./utils/auth');
 var routes = require('./routes/index');
 var products = require('./routes/products');
 var users = require('./routes/users');
+var sync = require('./routes/sync');
 
 polyfills();
 var initialised = init();
@@ -41,7 +42,9 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(function (req, res, next) {
-  if (auth(req.get('Authorization'), req.get('Date'))) {
+  var data = {};
+  if (auth(req.get('Authorization'), req.get('Date'), data)) {
+    req.myDeviceId = data.deviceId;
     next();
   } else if ('OPTIONS' === req.method) {
     res.status(200).end();
@@ -52,6 +55,7 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/v1/products', products);
 app.use('/v1/users', users);
+app.use('/v1/sync', sync);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

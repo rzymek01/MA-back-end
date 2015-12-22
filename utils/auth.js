@@ -4,7 +4,7 @@ var crypto = require('crypto');
 var UserRepo = require('../model/UserRepository');
 
 //@link http://restcookbook.com/Basics/loggingin/
-var auth = function(authHeader, dateHeader) {
+var auth = function(authHeader, dateHeader, data) {
   console.log('[auth]', authHeader, dateHeader);
 
   var headerParts = parseAuthHeader(authHeader);
@@ -21,8 +21,16 @@ var auth = function(authHeader, dateHeader) {
   }
 
   var hmac = computeHMAC(headerParts, dateHeader, user);
+  var success = (hmac === headerParts.hmac);
 
-  return (hmac === headerParts.hmac);
+  if (success) {
+    if (!clientIds[headerParts.email]) {
+      clientIds[headerParts.email] = headerParts.token;
+    }
+    data.deviceId = headerParts.token;
+  }
+
+  return success;
 };
 
 
@@ -74,5 +82,11 @@ var computeHMAC = function(headerParts, dateHeader, user) {
 
   return hash;
 };
+
+var lastClientId = 1;
+var getNewClientId = function() {
+  return lastClientId++;
+};
+var clientIds = {}; //"device_id": id
 
 module.exports = auth;
