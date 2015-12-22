@@ -129,6 +129,18 @@ ProductRepository.prototype.sync = function(deviceId, diffs) {
     }
   });
 
+  // update products modified on other device
+  Object.keys(this.products).forEach(function(srvProductId) {
+    srvProductId = +srvProductId;
+    if (deviceDiff[srvProductId] && -1 === newProductIds.indexOf(srvProductId)) {
+      if (that.products[srvProductId].amount !== deviceDiff[srvProductId].amount) {
+        newDiff[srvProductId] = {
+          amount: that.products[srvProductId].amount
+        }
+      }
+    }
+  });
+
   deviceDiffs[deviceId] = deepCopy(this.products);
   return newDiff;
 };
